@@ -1,4 +1,3 @@
-import turtle
 import math
 
 
@@ -18,7 +17,7 @@ def read_txt():
     return rules, beginning
 
 
-def draw_star(beginning, angle, actual_point):
+def follow_rules(beginning, angle, actual_point, size):
     """
     Draw the stars
     :param beginning: Current compiled phrase
@@ -27,20 +26,26 @@ def draw_star(beginning, angle, actual_point):
     for letter in beginning:
         for i in range(5):
             if letter == "B":
-                actual_point = [actual_point[0] + (120 * math.cos(math.radians(angle))), actual_point[1] +
-                                (120 * math.sin(math.radians(angle)))]
-                angle -= 216
+                actual_point, angle, points = draw_square(actual_point, angle, points, size)
             if letter == "R":
-                actual_point = [actual_point[0] + (60 * math.cos(math.radians(angle))), actual_point[1] +
-                                (60 * math.sin(math.radians(angle)))]
-                angle -= 216
+                size += 5
             if letter == "U":
-                actual_point = [actual_point[0] + (5 * math.cos(math.radians(angle))), actual_point[1] +
+                actual_point += [actual_point[0] + (5 * math.cos(math.radians(angle))), actual_point[1] +
                                 (5 * math.sin(math.radians(angle)))]
-            points += f'{actual_point[0]}, {actual_point[1]} '
-            print(points)
+                angle -= 1
+                points += f'{actual_point[0]}, {actual_point[1]} '
 
     return points
+
+
+def draw_square(actual_point, angle, points, size):
+    for i in range(4):
+        actual_point = [actual_point[0] + (size * math.cos(math.radians(angle))), actual_point[1] +
+                        (size * math.sin(math.radians(angle)))]
+        angle -= 90
+        points += f'{actual_point[0]}, {actual_point[1]} '
+    angle -= 1
+    return actual_point, angle, points
 
 
 def replace_beginning(rules, beginning):
@@ -68,7 +73,7 @@ def export_svg(points):
     Export the output_txt string into a SVG file
     :param points: Draw list of coordinates
     """
-    size = 310
+    size = 50000
     output_txt = f'''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
       <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN"
       "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
@@ -84,12 +89,13 @@ def export_svg(points):
 
 def main():
     rules, beginning = read_txt()
-    angle = 216
-    actual_point = [285, 285]
+    angle = 300
+    actual_point = [25000, 25000]
+    size = 10
     points = ""
 
-    for i in range(5):
-        points += draw_star(beginning, angle, actual_point) + ","
+    for i in range(15):
+        points += follow_rules(beginning, angle, actual_point, size) + ","
         beginning = replace_beginning(rules, beginning)
 
     export_svg(points)
@@ -97,5 +103,4 @@ def main():
 
 if __name__ == '__main__':
     main()
-
 
